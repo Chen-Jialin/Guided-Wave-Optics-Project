@@ -1,0 +1,33 @@
+clc; clear;
+lambda = 1.45e-6:0.01e-6:1.65e-6;
+f = c / lambda;
+x = getdata('FDE::data::material', 'x');
+y = getdata('FDE::data::material', 'y');
+n = matrix(423, 423, 21);
+neff = matrix(21);
+ng = matrix(21);
+Ex = matrix(423, 423, 21);
+Ey = matrix(423, 423, 21);
+Ez = matrix(423, 423, 21);
+mode_effective_area = matrix(21);
+
+for (i = 1:21)
+{
+    ?lambda(i);
+    setanalysis('wavelength', lambda(i));
+    setanalysis('number of trial modes', 1);
+    setanalysis('search', 1);
+    setanalysis('use max index', 1);
+    setanalysis('bent waveguide', 0);
+    setanalysis('helical waveguide', 0);
+    findmodes;
+
+    n(:, :, i) = getdata('FDE::data::material', 'index_x');
+    neff(i) = getdata('FDE::data::mode1', 'neff');
+    ng(i) = getdata('FDE::data::mode1', 'ng');
+    Ex(:, :, i) = getdata('FDE::data::mode1', 'Ex');
+    Ey(:, :, i) = getdata('FDE::data::mode1', 'Ey');
+    Ez(:, :, i) = getdata('FDE::data::mode1', 'Ez');
+    mode_effective_area(i) = getdata('FDE::data::mode1', 'mode effective area');
+    matlabsave("Fig_4_a_proposed_250nm");
+}

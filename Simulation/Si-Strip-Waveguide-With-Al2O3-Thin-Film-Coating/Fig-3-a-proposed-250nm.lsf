@@ -1,0 +1,38 @@
+clc; clear;
+W = 350e-9:10e-9:700e-9;
+lambda = 1.50e-6:0.005e-6:1.60e-6;
+f = c / lambda;
+neff = matrix(21, 36);
+vg = matrix(21, 36);
+beta = matrix(21, 36);
+
+for (i = 1:36)
+{
+    ?W(i);
+    switchtolayout;
+    select('Si Core');
+    set('x span', W(i));
+    select('Al2O3 Coating-1');
+    set('x span', W(i) + 500e-9);
+    setanalysis('wavelength', lambda(1));
+    setanalysis('number of trial modes', 1);
+    setanalysis('search', 1);
+    setanalysis('use max index', 1);
+    setanalysis('bent waveguide', 0);
+    setanalysis('helical waveguide', 0);
+    n=findmodes;
+
+    selectmode(1);
+    setanalysis('track selected mode', 1);
+    setanalysis('stop wavelength', lambda(end));
+    setanalysis('number of points', 21);
+    setanalysis('number of test modes', 1);
+    setanalysis('detailed dispersion calculation', 1);
+    setanalysis('store mode profiles while tracking', 0);
+    frequencysweep;
+
+    neff(:, i) = getdata('FDE::data::frequencysweep', 'neff');
+    vg(:, i) = getdata('FDE::data::frequencysweep', 'vg');
+    beta(:, i) = getdata('FDE::data::frequencysweep', 'beta');
+    matlabsave("Fig_3_a_proposed-250");
+}
